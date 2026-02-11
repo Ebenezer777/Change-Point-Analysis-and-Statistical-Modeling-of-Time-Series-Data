@@ -242,34 +242,29 @@ def plot_price_with_multiple_changepoints(df, tau_list, tau_labels=None,
     title : str
         Plot title
     """
-    fig, ax = plt.subplots(figsize=(14, 6))
-    
-    ax.plot(df['date'], df['price'], linewidth=1.5, alpha=0.8, label='Price', color='steelblue')
-    
-    colors = ['red', 'orange', 'purple', 'brown', 'green']
-    
+    plt.figure(figsize=(12, 6))
+    plt.plot(df['price'].values, label='Price', color='blue')
+
     for i, tau in enumerate(tau_list):
-        if tau_labels:
-            label = f'{tau_labels[i]} (day {tau})'
+        if 0 <= tau < len(df):
+            label = tau_labels[i] if tau_labels else f'Change Point {i+1}'
+            plt.axvline(
+                x=tau,
+                linestyle='--',
+                label=label
+            )
         else:
-            label = f'Change Point {i+1} (day {tau})'
-        
-        ax.axvline(df.loc[tau, 'date'], color=colors[i % len(colors)], 
-                   linestyle='--', linewidth=2, label=label)
-    
-    ax.set_xlabel('Date', fontsize=12)
-    ax.set_ylabel('Price', fontsize=12)
-    ax.set_title(title, fontsize=14, fontweight='bold')
-    ax.legend(fontsize=11)
-    ax.grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    
+            print(f"Warning: tau={tau} is out of bounds and was skipped.")
+
+    plt.title(title)
+    plt.xlabel("Time Index")
+    plt.ylabel("Price")
+    plt.legend()
+    plt.grid(True)
+
     if output_path:
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        plt.savefig(output_path, dpi=150, bbox_inches='tight')
-        print(f"✓ Saved: {output_path}")
-    
+        plt.savefig(output_path)
+
     plt.show()
 
 
